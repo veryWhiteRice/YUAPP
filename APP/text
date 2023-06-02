@@ -1,0 +1,7 @@
+MainActivity.java -> 1 Page
+roomActivity.java -> 2 Page
+ButtonActivity.java -> 3 Page 버튼 클릭시 작동하는 기능들입니다.
+
+activity_main.xml -> 1 Page UI
+room.xml -> 2 Page UI
+main2.xml -> 3 Page UI
