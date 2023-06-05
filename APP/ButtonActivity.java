@@ -94,7 +94,7 @@ public class ButtonActivity extends AppCompatActivity implements View.OnClickLis
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Clientsocket.sendMessage("영남");
+                    Clientsocket.sendMessage("영남 건물 위급상황 발생!!!");
                 }
             }).start();
         }
@@ -130,7 +130,7 @@ public class ButtonActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Clientsocket = new SocketManager("172.20.10.2", 51000); // 119 서버와 통신하는 소켓
+                Clientsocket = new SocketManager("172.20.10.9", 51000); // 119 서버와 통신하는 소켓
                 thread = new ReceiveThread2(Clientsocket);
                 thread.start();
             }
@@ -198,6 +198,8 @@ public class ButtonActivity extends AppCompatActivity implements View.OnClickLis
             sensorTextView.setText("SENSOR: ON");
             int colorOn = ContextCompat.getColor(this, R.color.lightBlue);
             sensorTextView.setTextColor(colorOn);
+            show_text.setText("");
+            show_text2.setText("");
         } else if (v.getId() == R.id.button4) {
             new Thread(new Runnable() {
                 @Override
