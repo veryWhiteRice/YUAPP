@@ -31,8 +31,33 @@ public class roomActivity extends AppCompatActivity
 
         // 각 호 버튼을 생성하고 클릭 이벤트 처리
         for (String room : roomList) {
+            LinearLayout roomLayout = new LinearLayout(this);
+            roomLayout.setOrientation(LinearLayout.VERTICAL);
+
+            // Create an ImageView for the room image
+            ImageView imageView = new ImageView(this);
+            imageView.setPadding(0, 0, 0, 30); // 패딩 제거
+
+            // Set the image source here. You might need to adjust this depending on where your images are.
+            imageView.setImageResource(R.drawable.room_image); // 'room_image' is the placeholder for your image resource.
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY); // 스케일 타입 조정
+            LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            imgParams.setMargins(0, 0, 0, 0); // 마진 제거
+
+            imageView.setLayoutParams(imgParams);
+            roomLayout.addView(imageView);
             Button button = new Button(this);
             button.setText(room);
+            button.setPadding(0,0,0,0);
+            LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            btnParams.bottomMargin = 100;  // adjust the value here
+            button.setLayoutParams(btnParams);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -40,7 +65,8 @@ public class roomActivity extends AppCompatActivity
                     handleRoomButtonClick(room);
                 }
             });
-            container.addView(button);
+            roomLayout.addView(button);
+            container.addView(roomLayout);
         }
     }
 
@@ -48,7 +74,7 @@ public class roomActivity extends AppCompatActivity
         // 예시로 호를 클릭했을 때 해당 호 번호를 다음 activity로 전달하여 연결된 소켓과 함께 사용할 수 있습니다.
         Intent intent = new Intent(roomActivity.this, ButtonActivity.class);
         intent.putExtra("room", room);
-        intent.putExtra("ip", "172.20.10.2"); // 선택된 방의 IP
+        intent.putExtra("ip", "172.20.10.9"); // 선택된 방의 IP
         intent.putExtra("port", 50000); // 선택된 방의 포트
         startActivity(intent);
     }
