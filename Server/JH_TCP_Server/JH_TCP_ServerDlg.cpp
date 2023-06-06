@@ -1,4 +1,4 @@
-﻿
+
 // JH_TCP_ServerDlg.cpp: 구현 파일
 //
 
@@ -72,23 +72,25 @@ BEGIN_MESSAGE_MAP(CJHTCPServerDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 END_MESSAGE_MAP()
 
-UINT RXThread(LPVOID arg)	//입력한 내용을 Server의 Sender Text Box에 출력
+UINT RXThread(LPVOID arg)	//Receive Thread 
 {
-	ThreadArg* pArg = (ThreadArg*)arg;
-	CStringList* plist = pArg->pList;
+	ThreadArg* pArg = (ThreadArg*)arg; // Thread 실행하는 arg를 가지고 온다.(arg2를 가르킴)
+	CStringList* plist = pArg->pList; // arg2의 pList를 가지고 온다.
 	CJHTCPServerDlg* pDlg = (CJHTCPServerDlg*)pArg->pDlg;
-	while (pArg->Thread_run) {
-		POSITION pos = plist->GetHeadPosition();
+	while (pArg->Thread_run) //Thread가 돌 때
+	{
+		POSITION pos = plist->GetHeadPosition(); //가장 최상단을 가르킴
 		POSITION current_pos;
-		while (pos != NULL) {
-			current_pos = pos;
+		while (pos != NULL) //현재 가르키는 곳에 문자열이 있다면
+		{
+			current_pos = pos; // 현재 가르키는 곳으로 Update
 			rx_cs.Lock();	//SenderTextBox의 임계구역을 Lock
-			CString str = plist->GetNext(pos);
+			CString str = plist->GetNext(pos); // pList 안에서 해당 부분에 있는 문자열을 가지고 온다.
 			rx_cs.Unlock();
-			char* txbuf = LPSTR(LPCTSTR(str));
+			char* txbuf = LPSTR(LPCTSTR(str)); // CString -> String 형 변환
 			CString message;
 			pDlg->m_rx_edit.GetWindowText(message);	//메세지 받음
-			message += str;
+			message += str; // 문자열 복사
 			message += "\r\n";
 
 			pDlg->m_rx_edit.SetWindowText(message);	//SenderTextBox에 메세지 출력
@@ -96,8 +98,8 @@ UINT RXThread(LPVOID arg)	//입력한 내용을 Server의 Sender Text Box에 출
 
 			plist->RemoveAt(current_pos);
 			char* str2 = (char*)malloc(sizeof(char) * MAX_BUF);
-			str2 = "119 상황실에 접수됐습니다. 현 시간부로 출발하겠습니다.";
-			pDlg->m_pDataSocket->Send(str2, (int)strlen(str2));
+			str2 = "119: Emergency\n";
+			pDlg->m_pDataSocket->Send(str2, (int)strlen(str2)); // 해당 Socket과 연결된 클라이언트에게 Message 전송
 		}
 		Sleep(10);
 	}
@@ -135,13 +137,13 @@ BOOL CJHTCPServerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
-	CStringList* newlist = new CStringList;
-	arg1.pList = newlist;
+	CStringList* newlist = new CStringList;// newlist 초기화
+	arg1.pList = newlist; // newlist를 arg1 구조체 List로 사용
 	arg1.Thread_run = 1;	//스레드 현재 상태
 	arg1.pDlg = this;
 
-	CStringList* newlist2 = new CStringList;
-	arg2.pList = newlist2;
+	CStringList* newlist2 = new CStringList;// newlist2 초기화
+	arg2.pList = newlist2; // newlist2를 arg2 구조체 List로 사용
 	arg2.Thread_run = 1;	//스레드 현재 상태
 	arg2.pDlg = this;
 	WSADATA wsa;
@@ -154,13 +156,12 @@ BOOL CJHTCPServerDlg::OnInitDialog()
 	m_pListenSocket = NULL;
 
 	ASSERT(m_pListenSocket == NULL);
-	m_pListenSocket = new CListenSocket(this);
-	if (m_pListenSocket->Create(51000)) {	//소켓 번호 설정
-		if (m_pListenSocket->Listen()) {
+	m_pListenSocket = new CListenSocket(this); // Socket 초기화
+	if (m_pListenSocket->Create(51000)) {	//소켓 포트번호 설정(51000)
+		if (m_pListenSocket->Listen()) //상대 Socket이 Connect할 때까지 대기
+		{
 			AfxMessageBox(_T("서버를 시작합니다."), MB_ICONINFORMATION);
-			//TX, RX 스레드 실행
-			//pThread1 = AfxBeginThread(TXThread, (LPVOID)&arg1);
-			pThread2 = AfxBeginThread(RXThread, (LPVOID)&arg2);
+			pThread2 = AfxBeginThread(RXThread, (LPVOID)&arg2); // Thread 실행
 			return TRUE;
 		}
 	}
@@ -223,21 +224,19 @@ HCURSOR CJHTCPServerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CJHTCPServerDlg::ProcessAccept(int nErrorCode)
+void CJHTCPServerDlg::ProcessAccept(int nErrorCode) // Socket 연결 요청 수락
 {
-	CString PeerAddr;
-	UINT PeerPort;
-	CString str;
+	CString PeerAddr; // 접근자 주소
+	UINT PeerPort; // 접근자 포트
 
 	m_pDataSocket = NULL;
 
 	ASSERT(nErrorCode == 0);
 	if (m_pDataSocket == NULL) {
-		m_pDataSocket = new CDataSocket(this);
-		if (m_pListenSocket->Accept(*m_pDataSocket)) {
+		m_pDataSocket = new CDataSocket(this);// DataSocket 초기화
+		if (m_pListenSocket->Accept(*m_pDataSocket)) // DataSocket을 이용해 접근자와 연결
+		{
 			m_pDataSocket->GetPeerName(PeerAddr, PeerPort);
-			/*str.Format(_T("### IP주소: %s, 포트 번호 :%d ##\r\n"), PeerAddr, PeerPort);
-			m_rx_edit.SetWindowTextW(str);*/
 		}
 		else {
 			delete m_pDataSocket;
@@ -246,20 +245,19 @@ void CJHTCPServerDlg::ProcessAccept(int nErrorCode)
 	}
 }
 
-//프로세스를 받았을 경우
-void CJHTCPServerDlg::ProcessReceive(CDataSocket* pSocket, int nErrorCode)
+void CJHTCPServerDlg::ProcessReceive(CDataSocket* pSocket, int nErrorCode) // 메세지를 받을 경우
 {
 	char pBuf[MAX_BUF];
 	CString strData = _T("");
 	int nbytes;
 
-	nbytes = pSocket->Receive(pBuf, 1024);
-	pBuf[nbytes] = NULL;
-	strData = (LPCSTR)(LPSTR)pBuf;
+	nbytes = pSocket->Receive(pBuf, 1024); // Socket을 통해 Message를 받음
+	pBuf[nbytes] = NULL; // Buf 끝 부분에 NULL 값 추가
+	strData = (LPCSTR)(LPSTR)pBuf; // CString으로 형 변환
 
-	rx_cs.Lock();
-	arg2.pList->AddTail(strData);
-	rx_cs.Unlock();
+	rx_cs.Lock(); // 임계구역 설정
+	arg2.pList->AddTail(strData); // arg2 List에 Receive Message 추가
+	rx_cs.Unlock(); // 임계구역 해제
 }
 //프로세스를 종료하였을 경우
 void CJHTCPServerDlg::ProcessClose(CDataSocket* pSocket, int nErrorCode) {
