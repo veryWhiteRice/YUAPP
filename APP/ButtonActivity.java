@@ -130,7 +130,7 @@ public class ButtonActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Clientsocket = new SocketManager("172.20.10.9", 51000); // 119 서버와 통신하는 소켓
+                Clientsocket = new SocketManager("172.20.10.2", 51000); // 119 서버와 통신하는 소켓
                 thread = new ReceiveThread2(Clientsocket);
                 thread.start();
             }
@@ -239,7 +239,6 @@ public class ButtonActivity extends AppCompatActivity implements View.OnClickLis
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
-
         // 알림 채널 생성
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
