@@ -130,7 +130,7 @@ public class ButtonActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Clientsocket = new SocketManager("172.20.10.2", 51000); // 119 서버와 통신하는 소켓
+                Clientsocket = new SocketManager("172.20.10.9", 51000); // 119 서버와 통신하는 소켓
                 thread = new ReceiveThread2(Clientsocket);
                 thread.start();
             }
