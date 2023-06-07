@@ -9,15 +9,6 @@ public class SocketManager {
     private final String serverIP = "172.20.10.3";//라즈베리파이 주소
     private final int serverPort = 50000;
 
-    /*private SocketManager()
-    {
-        // 소켓 초기화
-        try {
-            socket = new Socket(serverIP, serverPort);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
     public  SocketManager(String IP, int port)
     {
         // 소켓 초기화
@@ -28,18 +19,6 @@ public class SocketManager {
         }
     }
 
-    /*public static synchronized SocketManager getInstance() {
-        if (instance == null) {
-            instance = new SocketManager();
-        }
-        return instance;
-    }
-    public static synchronized SocketManager getInstance(String IP, int port) {
-        if (instance == null) {
-            instance = new SocketManager(IP, port);
-        }
-        return instance;
-    }*/
     public void sendMessage(String message) {
         // 소켓을 이용하여 메세지 전송
         try {
